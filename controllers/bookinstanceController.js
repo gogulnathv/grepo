@@ -7,7 +7,7 @@ exports.bookinstance_list = function(req, res) {
     .exec(function(err, list_bookinstances){
         if (err) { return next(err); }
         // Successful, so render
-        res.render('bookinstance_list', { title: 'Book Instance List', bookinstance_list: list_bookinstances });
+        res.render('bookinstance/list', { title: 'Book Instance List', bookinstance_list: list_bookinstances });
     })
 };
 
@@ -23,7 +23,7 @@ exports.bookinstance_detail = function(req, res) {
           return next(err);
         }
       // Successful, so render.
-      res.render('bookinstance_detail', { title: 'Copy: '+bookinstance.book.title, bookinstance:  bookinstance});
+      res.render('bookinstance/detail', { title: 'Copy: '+bookinstance.book.title, bookinstance:  bookinstance});
     })
 };
 

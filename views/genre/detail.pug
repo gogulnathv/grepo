@@ -1,19 +1,20 @@
-extends layout
+
+
+extends ../layout
 
 block content
 
-  h1 Author: #{author.name}
-  p #{author.date_of_birth} - #{author.date_of_death}
+  h1 Genre: #{genre.name}
   
   div(style='margin-left:20px;margin-top:20px')
 
     h4 Books
     
     dl
-      each book in author_books
+      each book in genre_books
         dt 
           a(href=book.url) #{book.title}
         dd #{book.summary}
 
       else
-        p This author has no books
+        p This genre has no books

@@ -33,12 +33,13 @@ exports.index = function(req, res) {
 
 // Display list of all books.
 exports.book_list = function(req, res) {
+    console.log(req.breadcrumbs);
     Book.find({}, 'title author')
     .populate('author')
     .exec(function (err, list_books) {
       if (err) { return next(err); }
       //Successful, so render
-      res.render('book_list', { title: 'Book List', book_list: list_books });
+      res.render('book/list', { title: 'Book List', book_list: list_books });
     });
 };
 
@@ -65,7 +66,7 @@ exports.book_detail = function(req, res) {
             return next(err);
         }
         // Successful, so render.
-        res.render('book_detail', { title: results.book.title, book: results.book, book_instances: results.book_instance } );
+        res.render('book/detail', { title: results.book.title, book: results.book, book_instances: results.book_instance } );
     });
 };
 
@@ -82,7 +83,7 @@ exports.book_create_get = function(req, res, next) {
         },
     }, function(err, results) {
         if (err) { return next(err); }
-        res.render('book_form', { title: 'Create Book', authors: results.authors, genres: results.genres });
+        res.render('book/form', { title: 'Create Book', authors: results.authors, genres: results.genres });
     });
     
 };
@@ -144,7 +145,7 @@ exports.book_create_post = [
                         results.genres[i].checked='true';
                     }
                 }
-                res.render('book_form', { title: 'Create Book',authors:results.authors, genres:results.genres, book: book, errors: errors.array() });
+                res.render('book/form', { title: 'Create Book',authors:results.authors, genres:results.genres, book: book, errors: errors.array() });
             });
             return;
         }

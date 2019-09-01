@@ -9,7 +9,7 @@ exports.genre_list = function(req, res) {
     .sort([['name', 'ascending']])
     .exec(function(err,genre_list){
         if(err) res.send(err)
-        res.render('genre_list',{title:'Genre List',genre_list:genre_list})
+        res.render('genre/list',{title:'Genre List',genre_list:genre_list})
     })
 };
 
@@ -35,14 +35,14 @@ exports.genre_detail = function(req, res, next) {
             return next(err);
         }
         // Successful, so render
-        res.render('genre_detail', { title: 'Genre Detail', genre: results.genre, genre_books: results.genre_books } );
+        res.render('genre/detail', { title: 'Genre Detail', genre: results.genre, genre_books: results.genre_books } );
     });
 
 };
 
 // Display Genre create form on GET.
 exports.genre_create_get = function(req, res) {
-    res.render('genre_form', { title: 'Create Genre' });
+    res.render('genre/form', { title: 'Create Genre' });
 };
 
 // Handle Genre create on POST.
@@ -68,7 +68,7 @@ exports.genre_create_post =  [
   
       if (!errors.isEmpty()) {
         // There are errors. Render the form again with sanitized values/error messages.
-        res.render('genre_form', { title: 'Create Genre', genre: genre, errors: errors.array()});
+        res.render('genre/form', { title: 'Create Genre', genre: genre, errors: errors.array()});
         return;
       }
       else {
@@ -109,10 +109,48 @@ exports.genre_delete_post = function(req, res) {
 
 // Display Genre update form on GET.
 exports.genre_update_get = function(req, res) {
-    res.send('NOT IMPLEMENTED: Genre update GET');
+    Genre.findById(req.params.id)
+    .exec(function(err,result){
+      if(err) res.send(err);
+      res.render('genre/form',{title:'Update '+result.name,genre:result})
+    })
 };
 
 // Handle Genre update on POST.
-exports.genre_update_post = function(req, res) {
-    res.send('NOT IMPLEMENTED: Genre update POST');
-};
+exports.genre_update_post = [
+    // Validate that the name field is not empty.
+    validator.body('name', 'Genre name required').isLength({ min: 1 }).trim(),
+    
+    // Sanitize (escape) the name field.
+    validator.sanitizeBody('name').escape(),
+  
+    // Process request after validation and sanitization.
+    (req, res, next) => {
+  
+      // Extract the validation errors from a request.
+      const errors = validator.validationResult(req);
+  
+      // Create a genre object with escaped and trimmed data.
+      var genre = new Genre(
+        { name: req.body.name }
+      );
+      if (!errors.isEmpty()) {
+        // There are errors. Render the form again with sanitized values/error messages.
+        Genre.findById(req.params.id)
+        .exec(function(err,result){
+          if(err) res.send(err);
+          res.render('genre/form',{title:'Update '+result.name,genre:result})
+        });
+        return
+      }
+      else {
+        var genre = new Genre(
+          { _id:req.params.id,name: req.body.name }
+        );
+        Genre.findByIdAndUpdate(req.params.id,genre,function(err,genre){
+          if(err) res.send(err);
+          res.redirect(genre.url);
+        })
+      }
+    }
+];
